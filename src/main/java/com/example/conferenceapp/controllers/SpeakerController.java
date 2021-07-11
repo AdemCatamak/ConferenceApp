@@ -2,11 +2,9 @@ package com.example.conferenceapp.controllers;
 
 import com.example.conferenceapp.models.Speaker;
 import com.example.conferenceapp.repositories.SpeakerRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,7 +16,7 @@ public class SpeakerController
     private SpeakerRepository speakerRepository;
 
     @GetMapping
-    public List<Speaker> get()
+    public List<Speaker> list()
     {
         List<Speaker> speakers = speakerRepository.findAll();
         return speakers;
@@ -30,5 +28,25 @@ public class SpeakerController
     {
         Speaker speaker = speakerRepository.getById(id);
         return speaker;
+    }
+
+    @PostMapping
+    public Speaker create(@RequestBody final Speaker speaker)
+    {
+        return speakerRepository.saveAndFlush(speaker);
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable Long id)
+    {
+        speakerRepository.deleteById(id);
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public Speaker update(@PathVariable Long id, @RequestBody Speaker speaker)
+    {
+        Speaker existingSpeaker = speakerRepository.getById(id);
+        BeanUtils.copyProperties(speaker, existingSpeaker, "speaker_id");
+        return speakerRepository.saveAndFlush(existingSpeaker);
     }
 }
